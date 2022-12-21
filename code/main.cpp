@@ -80,8 +80,8 @@ internal int generate_points(Colored_Point *points)
         Colored_Point point = {};
         point.rect.x = static_cast<int> (rand_x * WINDOW_WIDTH);
         point.rect.y = static_cast<int> (rand_y * WINDOW_HEIGHT);
-        point.rect.w = 5;
-        point.rect.h = 5;
+        point.rect.w = 3;
+        point.rect.h = 3;
         
         float dx = 0.5f - rand_x;
         float dy = 0.5f - rand_y;
