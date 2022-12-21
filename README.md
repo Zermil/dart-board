@@ -5,7 +5,7 @@ Simple (and probably not too accurate) [Monte Carlo Simulation](https://en.wikip
 ![sample](sample.png)
 
 ## Build
-Remember to change the variable `MSVC_PATH` in `build.bat` file accordingly
+Remember to change the `MSVC_PATH` variable in `build.bat` file accordingly
 
 ```console
 > build.bat
