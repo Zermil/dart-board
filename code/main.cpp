@@ -16,7 +16,7 @@
 #define CLEAR_COLOR 18, 18, 18, 255
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
-#define POINTS_SIZE 10000
+#define POINTS_CAPACITY 10000
 #define BULLSEYE_RADIUS 0.08
 
 typedef uint32_t Color32;
@@ -73,7 +73,7 @@ internal int generate_points(Colored_Point *points)
 {    
     int points_bullseye = 0;
     
-    for (int i = 0; i < POINTS_SIZE; ++i) {
+    for (int i = 0; i < POINTS_CAPACITY; ++i) {
         float rand_x = rand_float32();
         float rand_y = rand_float32();
 
@@ -110,9 +110,9 @@ int main(int argc, char **argv)
     mt_seed(static_cast<uint32_t> (time(0)));
     
     Render_Context render_context = create_window("Hello, Sailor!", WINDOW_WIDTH, WINDOW_HEIGHT);
-    Colored_Point *points = static_cast<Colored_Point *> (malloc(sizeof(Colored_Point) * POINTS_SIZE));
+    Colored_Point *points = static_cast<Colored_Point *> (malloc(sizeof(Colored_Point) * POINTS_CAPACITY));
 
-    printf("Probability :: %.2f%%\n", (static_cast<float> (generate_points(points)) / POINTS_SIZE) * 100.0f);
+    printf("Probability :: %.2f%%\n", (static_cast<float> (generate_points(points)) / POINTS_CAPACITY) * 100.0f);
     
     bool should_quit = false;
     while (!should_quit) {
@@ -131,7 +131,7 @@ int main(int argc, char **argv)
                         } break;
                         
                         case SDLK_r: {
-                            printf("Probability :: %.2f%%\n", (static_cast<float> (generate_points(points)) / POINTS_SIZE) * 100.0f);
+                            printf("Probability :: %.2f%%\n", (static_cast<float> (generate_points(points)) / POINTS_CAPACITY) * 100.0f);
                         } break;
                     }                    
                 } break;
@@ -141,7 +141,7 @@ int main(int argc, char **argv)
         SDL_SetRenderDrawColor(render_context.renderer, CLEAR_COLOR);
         SDL_RenderClear(render_context.renderer);
 
-        for (int i = 0; i < POINTS_SIZE; ++i) {
+        for (int i = 0; i < POINTS_CAPACITY; ++i) {
             SDL_SetRenderDrawColor(render_context.renderer, UNPACK_COL(points[i].color));
             SDL_RenderFillRect(render_context.renderer, &points[i].rect);
         }
