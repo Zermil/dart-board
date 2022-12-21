@@ -116,7 +116,7 @@ static void generate_numbers()
   state.index = 0;
 }
 
-extern "C" void seed(uint32_t value)
+extern "C" void mt_seed(uint32_t value)
 {
   /*
    * The equation below is a linear congruential generator (LCG), one of the
@@ -156,7 +156,7 @@ extern "C" void seed(uint32_t value)
     state.MT[i] = 0x6c078965*(state.MT[i-1] ^ state.MT[i-1]>>30) + i;
 }
 
-extern "C" uint32_t rand_u32()
+extern "C" uint32_t mt_rand_u32()
 {
   if ( state.index == SIZE ) {
     generate_numbers();
