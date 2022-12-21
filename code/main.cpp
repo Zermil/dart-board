@@ -17,7 +17,7 @@
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
 #define POINTS_SIZE 10000
-#define BULLSEYE_RADIUS 0.1
+#define BULLSEYE_RADIUS 0.08
 
 typedef uint32_t Color32;
 
@@ -35,7 +35,7 @@ struct Colored_Point
 
 internal inline float rand_float32()
 {
-    return((static_cast<float> (rand_u32()) / UINT32_MAX));
+    return((static_cast<float> (mt_rand_u32()) / UINT32_MAX));
 }
 
 internal Render_Context create_window(const char *title, int width, int height)
@@ -69,30 +69,23 @@ internal Render_Context create_window(const char *title, int width, int height)
     return(render_context);
 }
 
-int main(int argc, char **argv)
-{
-    UNUSED(argc);
-    UNUSED(argv);
-    seed(static_cast<uint32_t> (time(0)));
-    
-    Render_Context render_context = create_window("Hello, Sailor!", WINDOW_WIDTH, WINDOW_HEIGHT);
-    Colored_Point *points = static_cast<Colored_Point *> (malloc(sizeof(Colored_Point) * POINTS_SIZE));
-
+internal int generate_points(Colored_Point *points)
+{    
     int points_bullseye = 0;
     
     for (int i = 0; i < POINTS_SIZE; ++i) {
         float rand_x = rand_float32();
         float rand_y = rand_float32();
-        
+
         Colored_Point point = {};
         point.rect.x = static_cast<int> (rand_x * WINDOW_WIDTH);
         point.rect.y = static_cast<int> (rand_y * WINDOW_HEIGHT);
         point.rect.w = 5;
         point.rect.h = 5;
-
+        
         float dx = 0.5f - rand_x;
         float dy = 0.5f - rand_y;
-        
+
         if ((dx * dx) + (dy * dy) <= BULLSEYE_RADIUS * BULLSEYE_RADIUS) {
             point.color = 0xFF0000FF;
             points_bullseye += 1;
@@ -106,7 +99,20 @@ int main(int argc, char **argv)
         // printf("X :: %d, Y :: %d\n", point.rect.x, point.rect.y);
     }
 
-    printf("Probability :: %.2f%%\n", (static_cast<float> (points_bullseye) / POINTS_SIZE) * 100.0f);
+    return(points_bullseye);
+}
+
+int main(int argc, char **argv)
+{
+    UNUSED(argc);
+    UNUSED(argv);
+    
+    mt_seed(static_cast<uint32_t> (time(0)));
+    
+    Render_Context render_context = create_window("Hello, Sailor!", WINDOW_WIDTH, WINDOW_HEIGHT);
+    Colored_Point *points = static_cast<Colored_Point *> (malloc(sizeof(Colored_Point) * POINTS_SIZE));
+
+    printf("Probability :: %.2f%%\n", (static_cast<float> (generate_points(points)) / POINTS_SIZE) * 100.0f);
     
     bool should_quit = false;
     while (!should_quit) {
@@ -119,7 +125,15 @@ int main(int argc, char **argv)
                 } break;
 
                 case SDL_KEYDOWN: {
-                    if (event.key.keysym.sym == SDLK_ESCAPE) should_quit = true;
+                    switch (event.key.keysym.sym) {
+                        case SDLK_ESCAPE: {
+                            should_quit = true;                            
+                        } break;
+                        
+                        case SDLK_r: {
+                            printf("Probability :: %.2f%%\n", (static_cast<float> (generate_points(points)) / POINTS_SIZE) * 100.0f);
+                        } break;
+                    }                    
                 } break;
             }
         }
