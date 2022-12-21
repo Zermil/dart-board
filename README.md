@@ -12,7 +12,7 @@ Remember to change the variable `MSVC_PATH` in `build.bat` file accordingly
 ```
 
 ## Instruction
-`ESC` - exit
+`ESC` - exit\
 `R` - generate new set of points
 
 ## Notes
