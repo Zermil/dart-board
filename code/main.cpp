@@ -12,12 +12,15 @@
 #define UNUSED(x) ((void)(x))
 #define UNPACK_COL(color_bits) ((color_bits) >> 8 * 3) & 0xFF, ((color_bits) >> 8 * 2) & 0xFF, ((color_bits) >> 8 * 1) & 0xFF, ((color_bits) >> 8 * 0) & 0xFF
 #define internal static
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
 
 #define CLEAR_COLOR 18, 18, 18, 255
-#define WINDOW_WIDTH 600
+#define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
+#define CENTER_X (WINDOW_WIDTH * 0.5f)
+#define CENTER_Y (WINDOW_HEIGHT * 0.5f)
 #define POINTS_CAPACITY 10000
-#define BULLSEYE_RADIUS 0.08
+#define BULLSEYE_RADIUS (MIN(WINDOW_HEIGHT, WINDOW_WIDTH) * 0.08f)
 
 typedef uint32_t Color32;
 
@@ -83,8 +86,8 @@ internal int generate_points(Colored_Point *points)
         point.rect.w = 3;
         point.rect.h = 3;
         
-        float dx = 0.5f - rand_x;
-        float dy = 0.5f - rand_y;
+        float dx = CENTER_X - point.rect.x;
+        float dy = CENTER_Y - point.rect.y;
 
         if ((dx * dx) + (dy * dy) <= BULLSEYE_RADIUS * BULLSEYE_RADIUS) {
             point.color = 0xFF0000FF;
@@ -96,7 +99,7 @@ internal int generate_points(Colored_Point *points)
         points[i] = point;
 
         // NOTE(Aiden): This is useful for debugging and just cool to look at.
-        // printf("X :: %d, Y :: %d\n", point.rect.x, point.rect.y);
+        // printf("X :: %d, Y :: %d, point.rect.x, point.rect.y);
     }
 
     return(points_bullseye);
