@@ -121,7 +121,7 @@ int main(int argc, char **argv)
     while (!should_quit) {
         SDL_Event event = {};
         
-        while (SDL_PollEvent(&event)) {
+        if (SDL_WaitEvent(&event)) {
             switch (event.type) {
                 case SDL_QUIT: {
                     should_quit = true;
