@@ -7,7 +7,7 @@
 #define main SDL_main
 #include <SDL.h>
 
-#include "mt.h"
+#include "mt.cpp"
 
 #define UNUSED(x) ((void)(x))
 #define UNPACK_COL(color_bits) ((color_bits) >> 8 * 3) & 0xFF, ((color_bits) >> 8 * 2) & 0xFF, ((color_bits) >> 8 * 1) & 0xFF, ((color_bits) >> 8 * 0) & 0xFF

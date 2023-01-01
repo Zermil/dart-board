@@ -11,5 +11,5 @@ call %MSVC_PATH%\vcvars64.bat
 pushd %~dp0
 if not exist .\build mkdir build
 if not exist .\build\.gitkeep type nul > .\build\.gitkeep
-cl %CXXFLAGS% %INCLUDES% code\mt.cpp code\main.cpp /Fo:build\ /Fe:build\dart-board.exe %LIBS% /link /SUBSYSTEM:CONSOLE
+cl %CXXFLAGS% %INCLUDES% code\main.cpp /Fo:build\ /Fe:build\dart-board.exe %LIBS% /link /SUBSYSTEM:CONSOLE
 popd
