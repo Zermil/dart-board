@@ -13,7 +13,8 @@ Remember to change the `MSVC_PATH` variable in `build.bat` file accordingly
 
 ## Instruction
 `ESC` - exit\
-`R` - generate new set of points
+`R` - generate new set of points\
+`MOUSE WHEEL` - Change bullseye's radius
 
 ## Notes
 - We are using an awesome implementation of [Mersenne Twister](https://en.wikipedia.org/wiki/Mersenne_Twister) by [cslarsen](https://github.com/cslarsen/mersenne-twister), thank you so much.
