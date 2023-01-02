@@ -7,20 +7,24 @@
 #define main SDL_main
 #include <SDL.h>
 
-#include "mt.cpp"
+#define internal static
 
 #define UNUSED(x) ((void)(x))
 #define UNPACK_COL(color_bits) ((color_bits) >> 8 * 3) & 0xFF, ((color_bits) >> 8 * 2) & 0xFF, ((color_bits) >> 8 * 1) & 0xFF, ((color_bits) >> 8 * 0) & 0xFF
-#define internal static
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
-#define CLEAR_COLOR 18, 18, 18, 255
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define CENTER_X (WINDOW_WIDTH * 0.5f)
 #define CENTER_Y (WINDOW_HEIGHT * 0.5f)
+
+#define CLEAR_COLOR 18, 18, 18, 255
 #define POINTS_CAPACITY 10000
-#define SCALE_FACTOR 0.03f
+#define SCALE_DIFF 0.03f
+
+// NOTE(Aiden): Unity build.
+// https://en.wikipedia.org/wiki/Unity_build
+#include "mt.cpp"
 
 typedef uint32_t Color32;
 
@@ -41,7 +45,7 @@ internal inline float rand_float32()
     return((static_cast<float> (mt_rand_u32()) / UINT32_MAX));
 }
 
-internal Render_Context create_window(const char *title, int width, int height)
+internal Render_Context create_render_context(const char *title, int width, int height)
 {
     Render_Context render_context = {};
     
@@ -75,12 +79,9 @@ internal Render_Context create_window(const char *title, int width, int height)
 internal void generate_points(Colored_Point *points)
 {        
     for (int i = 0; i < POINTS_CAPACITY; ++i) {
-        float rand_x = rand_float32();
-        float rand_y = rand_float32();
-
         Colored_Point point = {};
-        point.rect.x = static_cast<int> (rand_x * WINDOW_WIDTH);
-        point.rect.y = static_cast<int> (rand_y * WINDOW_HEIGHT);
+        point.rect.x = static_cast<int> (rand_float32() * WINDOW_WIDTH);
+        point.rect.y = static_cast<int> (rand_float32() * WINDOW_HEIGHT);
         point.rect.w = 3;
         point.rect.h = 3;
         
@@ -117,7 +118,7 @@ int main(int argc, char **argv)
     
     mt_seed(static_cast<uint32_t> (time(0)));
     
-    Render_Context render_context = create_window("Hello, Sailor!", WINDOW_WIDTH, WINDOW_HEIGHT);
+    Render_Context render_context = create_render_context("Hello, Sailor!", WINDOW_WIDTH, WINDOW_HEIGHT);
     Colored_Point *points = static_cast<Colored_Point *> (malloc(sizeof(Colored_Point) * POINTS_CAPACITY));
 
     float bullseye_factor = 0.08f;
@@ -153,11 +154,11 @@ int main(int argc, char **argv)
 
                 case SDL_MOUSEWHEEL: {
                     if (event.wheel.preciseY > 0) {
-                        if (bullseye_factor + SCALE_FACTOR >= 0.5f) bullseye_factor = 0.5f;
-                        else bullseye_factor += SCALE_FACTOR;
+                        if (bullseye_factor + SCALE_DIFF >= 0.5f) bullseye_factor = 0.5f;
+                        else bullseye_factor += SCALE_DIFF;
                     } else {
-                        if (bullseye_factor - SCALE_FACTOR <= 0.03f) bullseye_factor = 0.03f;
-                        else bullseye_factor -= SCALE_FACTOR;
+                        if (bullseye_factor - SCALE_DIFF <= 0.03f) bullseye_factor = 0.03f;
+                        else bullseye_factor -= SCALE_DIFF;
                     }
 
                     bullseye_radius = MIN(WINDOW_HEIGHT, WINDOW_WIDTH) * bullseye_factor;
