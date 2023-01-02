@@ -20,7 +20,7 @@
 #define CENTER_X (WINDOW_WIDTH * 0.5f)
 #define CENTER_Y (WINDOW_HEIGHT * 0.5f)
 #define POINTS_CAPACITY 10000
-#define BULLSEYE_RADIUS (MIN(WINDOW_HEIGHT, WINDOW_WIDTH) * 0.08f)
+#define SCALE_FACTOR 0.03f
 
 typedef uint32_t Color32;
 
@@ -72,10 +72,8 @@ internal Render_Context create_window(const char *title, int width, int height)
     return(render_context);
 }
 
-internal int generate_points(Colored_Point *points)
-{    
-    int points_bullseye = 0;
-    
+internal void generate_points(Colored_Point *points)
+{        
     for (int i = 0; i < POINTS_CAPACITY; ++i) {
         float rand_x = rand_float32();
         float rand_y = rand_float32();
@@ -86,20 +84,27 @@ internal int generate_points(Colored_Point *points)
         point.rect.w = 3;
         point.rect.h = 3;
         
-        float dx = CENTER_X - point.rect.x;
-        float dy = CENTER_Y - point.rect.y;
-
-        if ((dx * dx) + (dy * dy) <= BULLSEYE_RADIUS * BULLSEYE_RADIUS) {
-            point.color = 0xFF0000FF;
-            points_bullseye += 1;
-        } else  {
-            point.color = 0x00FF00FF;
-        }
-                
         points[i] = point;
 
         // NOTE(Aiden): This is useful for debugging and just cool to look at.
         // printf("X :: %d, Y :: %d, point.rect.x, point.rect.y);
+    }
+}
+
+internal int count_points_in_center(Colored_Point *points, float bullseye_radius)
+{
+    int points_bullseye = 0;
+    
+    for (int i = 0; i < POINTS_CAPACITY; ++i) {
+        float dx = CENTER_X - points[i].rect.x;
+        float dy = CENTER_Y - points[i].rect.y;
+
+        if ((dx * dx) + (dy * dy) <= bullseye_radius * bullseye_radius) {
+            points[i].color = 0xFF0000FF;
+            points_bullseye += 1;
+        } else  {
+            points[i].color = 0x00FF00FF;
+        }
     }
 
     return(points_bullseye);
@@ -115,7 +120,12 @@ int main(int argc, char **argv)
     Render_Context render_context = create_window("Hello, Sailor!", WINDOW_WIDTH, WINDOW_HEIGHT);
     Colored_Point *points = static_cast<Colored_Point *> (malloc(sizeof(Colored_Point) * POINTS_CAPACITY));
 
-    printf("Probability :: %.2f%%\n", (static_cast<float> (generate_points(points)) / POINTS_CAPACITY) * 100.0f);
+    float bullseye_factor = 0.08f;
+    float bullseye_radius = MIN(WINDOW_HEIGHT, WINDOW_WIDTH) * bullseye_factor;
+
+    generate_points(points);
+    printf("Probability :: %.2f%%\n",
+           (static_cast<float> (count_points_in_center(points, bullseye_radius)) / POINTS_CAPACITY) * 100.0f);
     
     bool should_quit = false;
     while (!should_quit) {
@@ -134,9 +144,25 @@ int main(int argc, char **argv)
                         } break;
                         
                         case SDLK_r: {
-                            printf("Probability :: %.2f%%\n", (static_cast<float> (generate_points(points)) / POINTS_CAPACITY) * 100.0f);
+                            generate_points(points);
+                            printf("Probability :: %.2f%%\n",
+                                   (static_cast<float> (count_points_in_center(points, bullseye_radius)) / POINTS_CAPACITY) * 100.0f);
                         } break;
-                    }                    
+                    }
+                } break;
+
+                case SDL_MOUSEWHEEL: {
+                    if (event.wheel.preciseY > 0) {
+                        if (bullseye_factor + SCALE_FACTOR >= 0.5f) bullseye_factor = 0.5f;
+                        else bullseye_factor += SCALE_FACTOR;
+                    } else {
+                        if (bullseye_factor - SCALE_FACTOR <= 0.03f) bullseye_factor = 0.03f;
+                        else bullseye_factor -= SCALE_FACTOR;
+                    }
+
+                    bullseye_radius = MIN(WINDOW_HEIGHT, WINDOW_WIDTH) * bullseye_factor;
+                    printf("Probability :: %.2f%%\n",
+                           (static_cast<float> (count_points_in_center(points, bullseye_radius)) / POINTS_CAPACITY) * 100.0f);
                 } break;
             }
         }
